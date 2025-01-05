@@ -1,4 +1,3 @@
--- Auto Hop Script for Roblox
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local HttpService = game:GetService("HttpService")
@@ -13,20 +12,21 @@ local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.BackgroundTransparency = 1
 mainFrame.BorderSizePixel = 0
+mainFrame.Size = UDim2.new(0.3, 0, 0.3, 0) -- Set size of the frame
+mainFrame.Position = UDim2.new(0.35, 0, 0.35, 0) -- Center the frame
 mainFrame.Parent = ui
-mainFrame.Visible = false
+mainFrame.Visible = true -- Make it visible by default
 
 local toggleButton = Instance.new("TextButton")
 toggleButton.Name = "ToggleButton"
 toggleButton.BackgroundColor3 = Color3.new(0.164, 0.164, 0.164)
 toggleButton.BorderSizePixel = 0
-toggleButton.Position = UDim2.new(0.85, 0, 0.85, 0)
-toggleButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+toggleButton.Size = UDim2.new(1, 0, 0.4, 0) -- Adjust size to fit the frame
 toggleButton.Text = "Auto Hop"
 toggleButton.TextColor3 = Color3.new(1, 1, 1)
 toggleButton.Font = Enum.Font.Code
 toggleButton.TextSize = 14
-toggleButton.Parent = ui
+toggleButton.Parent = mainFrame
 
 -- Small Button UI
 local smallButton = Instance.new("TextButton")
@@ -92,4 +92,9 @@ toggleButton.MouseButton1Click:Connect(function()
     if autoHopEnabled then
         AutoHop()
     end
+end)
+
+-- Small Button to Toggle UI Visibility
+smallButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
 end)
