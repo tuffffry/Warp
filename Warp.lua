@@ -1,7 +1,8 @@
+-- Auto Hop Script for Roblox
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
 
 -- UI Configuration
 local ui = Instance.new("ScreenGui")
@@ -40,7 +41,55 @@ smallButton.Font = Enum.Font.Code
 smallButton.TextSize = 14
 smallButton.Parent = ui
 
+-- Auto Hop Variables
+local autoHopEnabled = false
+
+-- Function to hop to the next server
+local function hopToNextServer()
+    local placeId = game.PlaceId
+    local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?sortOrder=Asc&limit=100"
+    
+    local success, response = pcall(function()
+        return HttpService:GetAsync(url)
+    end)
+
+    if success then
+        local data = HttpService:JSONDecode(response)
+        local servers = data.data
+
+        -- Filter out full servers
+        local availableServers = {}
+        for _, server in ipairs(servers) do
+            if server.playing < server.maxPlayers then
+                table.insert(availableServers, server)
+            end
+        end
+
+        if #availableServers > 0 then
+            local randomServer = availableServers[math.random(1, #availableServers)]
+            TeleportService:TeleportToPlaceInstance(placeId, randomServer.id, LocalPlayer)
+        else
+            warn("No available servers to join.")
+        end
+    else
+        warn("Failed to get server data: " .. response)
+    end
+end
+
 -- Auto Hop Function
 local function AutoHop()
-    -- Your auto hop server logic here
+    while autoHopEnabled do
+        hopToNextServer()
+        wait(5) -- Wait for 5 seconds before hopping again
+    end
+end
+
+-- Toggle Button Functionality
+toggleButton.MouseButton1Click:Connect(function()
+    autoHopEnabled = not autoHopEnabled
+    toggleButton.Text = autoHopEnabled and "Stop Hop" or "Auto Hop"
     
+    if autoHopEnabled then
+        AutoHop()
+    end
+end)
